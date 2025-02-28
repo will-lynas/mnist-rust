@@ -174,7 +174,6 @@ impl Network {
         test_data
             .iter()
             .filter(|MnistSample { label, image }| {
-                // This will be changed later
                 self.feedforward(image).argmax() == label.argmax()
             })
             .count()
