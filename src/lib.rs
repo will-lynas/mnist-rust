@@ -4,6 +4,13 @@ use ndarray::Array1;
 use ndarray::Array2;
 use ndarray_rand::RandomExt;
 use ndarray_rand::rand_distr::Normal;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct MnistSample {
+    pub label: Array1<f64>,
+    pub image: Array1<f64>,
+}
 
 fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())

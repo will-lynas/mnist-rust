@@ -1,14 +1,9 @@
 use csv::Reader;
 use ndarray::Array1;
-use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufWriter, Write};
 
-#[derive(Serialize, Deserialize)]
-struct MnistSample {
-    label: Array1<f64>,
-    image: Array1<f64>,
-}
+use mnist_rust::MnistSample;
 
 fn main() {
     process_csv("mnist_train");
