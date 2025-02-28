@@ -2,8 +2,13 @@ use std::iter::zip;
 
 use ndarray::Array1;
 use ndarray::Array2;
+use ndarray::array;
 use ndarray_rand::RandomExt;
 use ndarray_rand::rand_distr::Normal;
+
+fn sigmoid(x: f64) -> f64 {
+    1.0 / (1.0 + (-x).exp())
+}
 
 #[allow(dead_code)]
 struct Network {
@@ -32,8 +37,16 @@ impl Network {
             weights,
         }
     }
+
+    fn feedforward(&self, a: Array1<f64>) -> Array1<f64> {
+        zip(self.biases.iter(), self.weights.iter())
+            .fold(a, |a, (b, w)| (w.dot(&a) + b).mapv(sigmoid))
+    }
 }
 
 fn main() {
-    let _network = Network::new(vec![3, 4, 4, 3]);
+    let network = Network::new(vec![3, 4, 4, 3]);
+    let a = array![1.0, 2.0, 3.0];
+    let b = network.feedforward(a);
+    println!("{:?}", b);
 }
