@@ -8,6 +8,7 @@ use ndarray::Array1;
 use ndarray::Array2;
 use ndarray_rand::RandomExt;
 use ndarray_rand::rand_distr::Normal;
+use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -65,5 +66,37 @@ impl Network {
     pub fn feedforward(&self, a: Array1<f64>) -> Array1<f64> {
         zip(self.biases.iter(), self.weights.iter())
             .fold(a, |a, (b, w)| (w.dot(&a) + b).mapv(sigmoid))
+    }
+
+    pub fn sgd(
+        &mut self,
+        mut training_data: Vec<&MnistSample>,
+        epochs: usize,
+        mini_batch_size: usize,
+        eta: f64,
+        test_data: Option<&[MnistSample]>,
+    ) {
+        (0..epochs).for_each(|epoch| {
+            training_data.shuffle(&mut rand::rng());
+            training_data
+                .chunks(mini_batch_size)
+                .for_each(|mini_batch| {
+                    self.update_mini_batch(mini_batch, eta);
+                });
+            if let Some(test_data) = test_data {
+                let accuracy = self.evaluate(test_data);
+                println!("Epoch {} : {} / {}", epoch, accuracy, test_data.len());
+            } else {
+                println!("Epoch {} complete", epoch);
+            }
+        });
+    }
+
+    pub fn update_mini_batch(&mut self, mini_batch: &[&MnistSample], eta: f64) {
+        todo!()
+    }
+
+    pub fn evaluate(&self, test_data: &[MnistSample]) -> usize {
+        todo!()
     }
 }
