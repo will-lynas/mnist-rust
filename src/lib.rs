@@ -63,9 +63,9 @@ impl Network {
         }
     }
 
-    pub fn feedforward(&self, a: Array1<f64>) -> Array1<f64> {
+    pub fn feedforward(&self, a: &Array1<f64>) -> Array1<f64> {
         zip(self.biases.iter(), self.weights.iter())
-            .fold(a, |a, (b, w)| (w.dot(&a) + b).mapv(sigmoid))
+            .fold(a.clone(), |a, (b, w)| (w.dot(&a) + b).mapv(sigmoid))
     }
 
     pub fn sgd(
