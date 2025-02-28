@@ -93,7 +93,51 @@ impl Network {
         });
     }
 
-    pub fn update_mini_batch(&mut self, mini_batch: &[&MnistSample], eta: f64) {
+    fn update_mini_batch(&mut self, mini_batch: &[&MnistSample], eta: f64) {
+        let mut nabla_b: Vec<_> = self
+            .biases
+            .iter()
+            .map(|b| Array1::<f64>::zeros(b.dim()))
+            .collect();
+        let mut nabla_w: Vec<_> = self
+            .weights
+            .iter()
+            .map(|w| Array2::<f64>::zeros(w.dim()))
+            .collect();
+
+        mini_batch
+            .iter()
+            .map(|sample| self.backprop(sample))
+            .for_each(|(nabla_b_i, nabla_w_i)| {
+                nabla_b
+                    .iter_mut()
+                    .zip(nabla_b_i.iter())
+                    .for_each(|(nabla_b, nabla_b_i)| {
+                        *nabla_b += nabla_b_i;
+                    });
+                nabla_w
+                    .iter_mut()
+                    .zip(nabla_w_i.iter())
+                    .for_each(|(nabla_w, nabla_w_i)| {
+                        *nabla_w += nabla_w_i;
+                    });
+            });
+
+        self.biases
+            .iter_mut()
+            .zip(nabla_b.iter())
+            .for_each(|(b, nabla_b)| {
+                *b -= &(nabla_b * eta / mini_batch.len() as f64);
+            });
+        self.weights
+            .iter_mut()
+            .zip(nabla_w.iter())
+            .for_each(|(w, nabla_w)| {
+                *w -= &(nabla_w * eta / mini_batch.len() as f64);
+            });
+    }
+
+    fn backprop(&self, mnist_sample: &MnistSample) -> (Vec<Array1<f64>>, Vec<Array2<f64>>) {
         todo!()
     }
 
