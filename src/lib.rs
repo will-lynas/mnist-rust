@@ -35,6 +35,15 @@ fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
 }
 
+fn sigmoid_prime(x: f64) -> f64 {
+    let s = sigmoid(x);
+    s * (1.0 - s)
+}
+
+fn cost_derivative(output_activations: &Array1<f64>, y: &Array1<f64>) -> Array1<f64> {
+    output_activations - y
+}
+
 pub struct Network {
     #[allow(dead_code)]
     num_layers: usize,
