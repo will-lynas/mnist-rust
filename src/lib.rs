@@ -138,6 +138,26 @@ impl Network {
     }
 
     fn backprop(&self, mnist_sample: &MnistSample) -> (Vec<Array1<f64>>, Vec<Array2<f64>>) {
+        let mut nabla_b: Vec<_> = self
+            .biases
+            .iter()
+            .map(|b| Array1::<f64>::zeros(b.dim()))
+            .collect();
+        let mut nabla_w: Vec<_> = self
+            .weights
+            .iter()
+            .map(|w| Array2::<f64>::zeros(w.dim()))
+            .collect();
+
+        let mut activations: Vec<Array1<f64>> = vec![mnist_sample.image.clone()];
+        let mut zs: Vec<Array1<f64>> = vec![];
+
+        zip(self.biases.iter(), self.weights.iter()).for_each(|(b, w)| {
+            let z = w.dot(activations.last().unwrap()) + b;
+            activations.push(z.mapv(sigmoid));
+            zs.push(z);
+        });
+
         todo!()
     }
 
