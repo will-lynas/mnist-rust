@@ -1,9 +1,7 @@
 use csv::Reader;
 use ndarray::Array1;
-use std::fs::File;
-use std::io::{BufWriter, Write};
 
-use mnist_rust::MnistSample;
+use mnist_rust::{MnistSample, save_mnist_samples};
 
 fn main() {
     process_csv("mnist_train");
@@ -37,9 +35,5 @@ fn process_csv(file_name: &str) {
         .collect();
 
     let output_file = format!("data/{}_processed.bin", file_name);
-    let file = File::create(output_file).unwrap();
-    let mut writer = BufWriter::new(file);
-
-    let serialized = bincode::serialize(&dataset).unwrap();
-    writer.write_all(&serialized).unwrap();
+    save_mnist_samples(dataset, &output_file);
 }
