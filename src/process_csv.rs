@@ -1,4 +1,4 @@
-use csv::Reader;
+use csv::ReaderBuilder;
 use ndarray::Array1;
 
 use mnist_rust::{MnistSample, save_mnist_samples};
@@ -10,7 +10,10 @@ fn main() {
 
 fn process_csv(file_name: &str) {
     let csv_file_name = format!("data/{}.csv", file_name);
-    let mut reader = Reader::from_path(csv_file_name).unwrap();
+    let mut reader = ReaderBuilder::new()
+        .has_headers(false)
+        .from_path(csv_file_name)
+        .unwrap();
 
     let dataset: Vec<MnistSample> = reader
         .records()
