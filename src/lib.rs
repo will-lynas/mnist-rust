@@ -9,9 +9,10 @@ fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
 }
 
-#[allow(dead_code)]
 pub struct Network {
+    #[allow(dead_code)]
     num_layers: usize,
+    #[allow(dead_code)]
     sizes: Vec<usize>,
     biases: Vec<Array1<f64>>,
     weights: Vec<Array2<f64>>,
