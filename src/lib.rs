@@ -45,17 +45,12 @@ fn cost_derivative(output_activations: &Array1<f64>, y: &Array1<f64>) -> Array1<
 }
 
 pub struct Network {
-    #[allow(dead_code)]
-    num_layers: usize,
-    #[allow(dead_code)]
-    sizes: Vec<usize>,
     biases: Vec<Array1<f64>>,
     weights: Vec<Array2<f64>>,
 }
 
 impl Network {
     pub fn new(sizes: Vec<usize>) -> Self {
-        let num_layers = sizes.len();
         let biases = sizes
             .iter()
             .skip(1)
@@ -65,12 +60,7 @@ impl Network {
             .map(|(&x, &y)| Array2::random((y, x), Normal::new(0.0, 1.0).unwrap()))
             .collect();
 
-        Network {
-            num_layers,
-            sizes,
-            biases,
-            weights,
-        }
+        Network { biases, weights }
     }
 
     pub fn feedforward(&self, a: &Array1<f64>) -> Array1<f64> {
