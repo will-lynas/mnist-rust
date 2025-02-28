@@ -8,6 +8,7 @@ use ndarray::Array1;
 use ndarray::Array2;
 use ndarray_rand::RandomExt;
 use ndarray_rand::rand_distr::Normal;
+use ndarray_stats::QuantileExt;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 
@@ -97,6 +98,12 @@ impl Network {
     }
 
     pub fn evaluate(&self, test_data: &[MnistSample]) -> usize {
-        todo!()
+        test_data
+            .iter()
+            .filter(|MnistSample { label, image }| {
+                // This will be changed later
+                self.feedforward(image).argmax() == label.argmax()
+            })
+            .count()
     }
 }
