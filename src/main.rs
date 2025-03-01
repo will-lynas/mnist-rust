@@ -5,9 +5,9 @@ fn main() {
     let mnist_test = load_mnist_samples("data/mnist_test_processed.bin");
 
     let mut network = Network::new(vec![28 * 28, 30, 10]);
-    let epochs = 50;
+    let epochs = 30;
     let mini_batch_size = 10;
-    let eta = 0.005;
+    let eta = 3.0;
     network.sgd(
         mnist_train.iter().collect(),
         epochs,

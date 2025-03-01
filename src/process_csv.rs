@@ -27,7 +27,7 @@ fn process_csv(file_name: &str) {
             let image = record
                 .iter()
                 .skip(1)
-                .map(|val| val.parse::<f64>().unwrap())
+                .map(|val| val.parse::<f64>().unwrap() / 255.0)
                 .collect();
 
             MnistSample {
