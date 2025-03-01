@@ -89,34 +89,15 @@ impl Network {
     }
 
     fn update_mini_batch(&mut self, mini_batch: &[&MnistSample], eta: f64) {
-        let mut nabla_b: Vec<_> = self
-            .biases
-            .iter()
-            .map(|b| Array1::<f64>::zeros(b.dim()))
-            .collect();
-        let mut nabla_w: Vec<_> = self
-            .weights
-            .iter()
-            .map(|w| Array2::<f64>::zeros(w.dim()))
-            .collect();
-
-        mini_batch
+        let (nabla_b, nabla_w) = mini_batch
             .iter()
             .map(|sample| self.backprop(sample))
-            .for_each(|(nabla_b_i, nabla_w_i)| {
-                nabla_b
-                    .iter_mut()
-                    .zip(nabla_b_i.iter())
-                    .for_each(|(nabla_b, nabla_b_i)| {
-                        *nabla_b += nabla_b_i;
-                    });
-                nabla_w
-                    .iter_mut()
-                    .zip(nabla_w_i.iter())
-                    .for_each(|(nabla_w, nabla_w_i)| {
-                        *nabla_w += nabla_w_i;
-                    });
-            });
+            .reduce(|(mut nb, mut nw), (nb_i, nw_i)| {
+                nb.iter_mut().zip(nb_i).for_each(|(nb, nb_i)| *nb += &nb_i);
+                nw.iter_mut().zip(nw_i).for_each(|(nw, nw_i)| *nw += &nw_i);
+                (nb, nw)
+            })
+            .unwrap();
 
         self.biases
             .iter_mut()
