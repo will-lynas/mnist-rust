@@ -68,8 +68,9 @@ impl Network {
         eta: f64,
         test_data: Option<&[MnistSample]>,
     ) {
-        (0..epochs).for_each(|epoch| {
+        for epoch in 0..epochs {
             println!("Epoch {} of {}", epoch + 1, epochs);
+
             training_data.shuffle(&mut rand::rng());
             training_data
                 .chunks(mini_batch_size)
@@ -77,13 +78,14 @@ impl Network {
                 .for_each(|mini_batch| {
                     self.update_mini_batch(mini_batch, eta);
                 });
+
             if let Some(test_data) = test_data {
                 let accuracy = self.evaluate(test_data);
                 println!("  Accuracy: {} / {}", accuracy, test_data.len());
             } else {
                 println!("  Complete");
             }
-        });
+        }
     }
 
     fn update_mini_batch(&mut self, mini_batch: &[&MnistSample], eta: f64) {
