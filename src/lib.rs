@@ -82,6 +82,7 @@ impl Network {
         test_data: Option<&[MnistSample]>,
     ) {
         (0..epochs).for_each(|epoch| {
+            println!("Epoch {} of {}", epoch, epochs);
             training_data.shuffle(&mut rand::rng());
             training_data
                 .chunks(mini_batch_size)
@@ -90,9 +91,9 @@ impl Network {
                 });
             if let Some(test_data) = test_data {
                 let accuracy = self.evaluate(test_data);
-                println!("Epoch {} : {} / {}", epoch, accuracy, test_data.len());
+                println!("  Accuracy: {} / {}", accuracy, test_data.len());
             } else {
-                println!("Epoch {} complete", epoch);
+                println!("  Complete");
             }
         });
     }
