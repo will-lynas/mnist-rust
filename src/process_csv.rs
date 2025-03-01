@@ -10,6 +10,7 @@ fn main() {
 
 fn process_csv(file_name: &str) {
     let csv_file_name = format!("data/{}.csv", file_name);
+    println!("Processing {}", csv_file_name);
     let mut reader = ReaderBuilder::new()
         .has_headers(false)
         .from_path(csv_file_name)
@@ -38,5 +39,6 @@ fn process_csv(file_name: &str) {
         .collect();
 
     let output_file = format!("data/{}_processed.bin", file_name);
+    println!("  Saving to {}", output_file);
     save_mnist_samples(dataset, &output_file);
 }
