@@ -99,18 +99,13 @@ impl Network {
             })
             .unwrap();
 
-        self.biases
-            .iter_mut()
-            .zip(nabla_b.iter())
-            .for_each(|(b, nabla_b)| {
-                *b -= &(nabla_b * eta / mini_batch.len() as f64);
-            });
-        self.weights
-            .iter_mut()
-            .zip(nabla_w.iter())
-            .for_each(|(w, nabla_w)| {
-                *w -= &(nabla_w * eta / mini_batch.len() as f64);
-            });
+        let scale = eta / mini_batch.len() as f64;
+        for (b, nb) in zip(&mut self.biases, nabla_b) {
+            *b -= &(nb * scale);
+        }
+        for (w, nw) in zip(&mut self.weights, nabla_w) {
+            *w -= &(nw * scale);
+        }
     }
 
     fn backprop(&self, mnist_sample: &MnistSample) -> (Vec<Array1<f64>>, Vec<Array2<f64>>) {
