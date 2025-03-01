@@ -148,14 +148,13 @@ impl Network {
         let mut nabla_b = Vec::new();
         let mut nabla_w = Vec::new();
 
-        let mut activation = mnist_sample.image.clone();
-        let mut activations: Vec<Array1<f64>> = vec![activation];
+        let mut activations: Vec<Array1<f64>> = vec![mnist_sample.image.clone()];
         let mut zs: Vec<Array1<f64>> = vec![];
 
         // Forward pass
         for (b, w) in zip(&self.biases, &self.weights) {
             let z = w.dot(activations.last().unwrap()) + b;
-            activation = z.mapv(sigmoid);
+            let activation = z.mapv(sigmoid);
             zs.push(z);
             activations.push(activation);
         }
@@ -165,7 +164,7 @@ impl Network {
         let mut delta = cost_derivative(activations.last().unwrap(), &mnist_sample.label) * sp;
         nabla_b.push(delta.clone());
 
-        let mut delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
+        let delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
         let a_t = activations[activations.len() - 2]
             .clone()
             .insert_axis(ndarray::Axis(0)); // Row vector
@@ -177,7 +176,7 @@ impl Network {
             let z = zs[zs.len() - l].clone();
             let sp = z.mapv(sigmoid_prime);
             delta = self.weights[self.weights.len() - l + 1].t().dot(&delta) * sp;
-            delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
+            let delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
             nabla_b.push(delta.clone());
             let a_t = activations[activations.len() - l - 1]
                 .clone()
