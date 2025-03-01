@@ -4,6 +4,7 @@ use std::io::BufWriter;
 use std::io::Write;
 use std::iter::zip;
 
+use indicatif::ProgressIterator;
 use ndarray::Array1;
 use ndarray::Array2;
 use ndarray_rand::RandomExt;
@@ -86,6 +87,7 @@ impl Network {
             training_data.shuffle(&mut rand::rng());
             training_data
                 .chunks(mini_batch_size)
+                .progress()
                 .for_each(|mini_batch| {
                     self.update_mini_batch(mini_batch, eta);
                 });
