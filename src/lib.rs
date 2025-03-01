@@ -38,13 +38,14 @@ pub struct Network {
 
 impl Network {
     pub fn new(sizes: Vec<usize>) -> Self {
+        let normal = Normal::new(0.0, 1.0).unwrap();
         let biases = sizes
             .iter()
             .skip(1)
-            .map(|&size| Array1::random(size, Normal::new(0.0, 1.0).unwrap()))
+            .map(|&size| Array1::random(size, normal))
             .collect();
         let weights = zip(sizes.iter(), sizes.iter().skip(1))
-            .map(|(&x, &y)| Array2::random((y, x), Normal::new(0.0, 1.0).unwrap()))
+            .map(|(&x, &y)| Array2::random((y, x), normal))
             .collect();
 
         Network {
