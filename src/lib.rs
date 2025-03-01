@@ -83,7 +83,7 @@ impl Network {
         test_data: Option<&[MnistSample]>,
     ) {
         (0..epochs).for_each(|epoch| {
-            println!("Epoch {} of {}", epoch, epochs);
+            println!("Epoch {} of {}", epoch + 1, epochs);
             training_data.shuffle(&mut rand::rng());
             training_data
                 .chunks(mini_batch_size)
