@@ -1,4 +1,4 @@
-use mnist_rust::{Network, load_mnist_samples};
+use mnist_rust::{Network, utils::load_mnist_samples};
 
 fn main() {
     let mnist_train = load_mnist_samples("data/mnist_train_processed.bin");

@@ -1,7 +1,3 @@
-use std::fs::File;
-use std::io::BufReader;
-use std::io::BufWriter;
-use std::io::Write;
 use std::iter::zip;
 
 use indicatif::ProgressIterator;
@@ -13,23 +9,12 @@ use ndarray_stats::QuantileExt;
 use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 
+pub mod utils;
+
 #[derive(Serialize, Deserialize)]
 pub struct MnistSample {
     pub label: Array1<f64>,
     pub image: Array1<f64>,
-}
-
-pub fn save_mnist_samples(data: Vec<MnistSample>, file_name: &str) {
-    let file = File::create(file_name).unwrap();
-    let mut writer = BufWriter::new(file);
-    let serialized = bincode::serialize(&data).unwrap();
-    writer.write_all(&serialized).unwrap();
-}
-
-pub fn load_mnist_samples(file_name: &str) -> Vec<MnistSample> {
-    let file = File::open(file_name).unwrap();
-    let reader = BufReader::new(file);
-    bincode::deserialize_from(reader).unwrap()
 }
 
 fn sigmoid(x: f64) -> f64 {

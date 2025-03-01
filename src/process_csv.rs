@@ -1,7 +1,7 @@
 use csv::ReaderBuilder;
 use ndarray::Array1;
 
-use mnist_rust::{MnistSample, save_mnist_samples};
+use mnist_rust::{MnistSample, utils::save_mnist_samples};
 
 fn main() {
     process_csv("mnist_train");
