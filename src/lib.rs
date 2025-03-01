@@ -150,19 +150,19 @@ impl Network {
 
         let mut activation = mnist_sample.image.clone();
         let mut activations: Vec<Array1<f64>> = vec![activation];
-        let mut z: Array1<f64>;
         let mut zs: Vec<Array1<f64>> = vec![];
 
         // Forward pass
         for (b, w) in zip(&self.biases, &self.weights) {
-            z = w.dot(activations.last().unwrap()) + b;
+            let z = w.dot(activations.last().unwrap()) + b;
             activation = z.mapv(sigmoid);
             zs.push(z);
             activations.push(activation);
         }
 
         // Last layer
-        let mut delta = cost_derivative(activations.last().unwrap(), &mnist_sample.label);
+        let sp = zs.last().unwrap().mapv(sigmoid_prime);
+        let mut delta = cost_derivative(activations.last().unwrap(), &mnist_sample.label) * sp;
         nabla_b.push(delta.clone());
 
         let mut delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
@@ -174,7 +174,7 @@ impl Network {
 
         // Backward pass
         for l in 2..self.num_layers {
-            z = zs[zs.len() - l].clone();
+            let z = zs[zs.len() - l].clone();
             let sp = z.mapv(sigmoid_prime);
             delta = self.weights[self.weights.len() - l + 1].t().dot(&delta) * sp;
             delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
