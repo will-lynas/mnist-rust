@@ -171,13 +171,15 @@ impl Network {
         nabla_w.push(prod);
 
         // Backward pass
-        for l in (0..self.num_layers - 2).rev() {
-            z = zs[l + 1].clone();
+        for l in 2..self.num_layers {
+            z = zs[zs.len() - l].clone();
             let sp = z.mapv(sigmoid_prime);
-            delta = self.weights[l + 1].t().dot(&delta) * sp;
+            delta = self.weights[self.weights.len() - l + 1].t().dot(&delta) * sp;
             delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
             nabla_b.push(delta.clone());
-            let a_t = activations[l].clone().insert_axis(ndarray::Axis(0));
+            let a_t = activations[activations.len() - l - 1]
+                .clone()
+                .insert_axis(ndarray::Axis(0));
             nabla_w.push(delta2d.dot(&a_t));
         }
 
