@@ -45,6 +45,7 @@ fn cost_derivative(output_activations: &Array1<f64>, y: &Array1<f64>) -> Array1<
 }
 
 pub struct Network {
+    num_layers: usize,
     biases: Vec<Array1<f64>>,
     weights: Vec<Array2<f64>>,
 }
@@ -60,7 +61,11 @@ impl Network {
             .map(|(&x, &y)| Array2::random((y, x), Normal::new(0.0, 1.0).unwrap()))
             .collect();
 
-        Network { biases, weights }
+        Network {
+            num_layers: sizes.len(),
+            biases,
+            weights,
+        }
     }
 
     pub fn feedforward(&self, a: &Array1<f64>) -> Array1<f64> {
@@ -137,27 +142,48 @@ impl Network {
     }
 
     fn backprop(&self, mnist_sample: &MnistSample) -> (Vec<Array1<f64>>, Vec<Array2<f64>>) {
-        let mut nabla_b: Vec<_> = self
-            .biases
-            .iter()
-            .map(|b| Array1::<f64>::zeros(b.dim()))
-            .collect();
-        let mut nabla_w: Vec<_> = self
-            .weights
-            .iter()
-            .map(|w| Array2::<f64>::zeros(w.dim()))
-            .collect();
+        let mut nabla_b = Vec::new();
+        let mut nabla_w = Vec::new();
 
-        let mut activations: Vec<Array1<f64>> = vec![mnist_sample.image.clone()];
+        let mut activation = mnist_sample.image.clone();
+        let mut activations: Vec<Array1<f64>> = vec![activation];
+        let mut z: Array1<f64>;
         let mut zs: Vec<Array1<f64>> = vec![];
 
-        zip(self.biases.iter(), self.weights.iter()).for_each(|(b, w)| {
-            let z = w.dot(activations.last().unwrap()) + b;
-            activations.push(z.mapv(sigmoid));
+        // Forward pass
+        for (b, w) in zip(&self.biases, &self.weights) {
+            z = w.dot(activations.last().unwrap()) + b;
+            activation = z.mapv(sigmoid);
             zs.push(z);
-        });
+            activations.push(activation);
+        }
 
-        todo!()
+        // Last layer
+        let mut delta = cost_derivative(activations.last().unwrap(), &mnist_sample.label);
+        nabla_b.push(delta.clone());
+
+        let mut delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
+        let a_t = activations[activations.len() - 2]
+            .clone()
+            .insert_axis(ndarray::Axis(0)); // Row vector
+        let prod = delta2d.dot(&a_t);
+        nabla_w.push(prod);
+
+        // Backward pass
+        for l in (0..self.num_layers - 2).rev() {
+            z = zs[l + 1].clone();
+            let sp = z.mapv(sigmoid_prime);
+            delta = self.weights[l + 1].t().dot(&delta) * sp;
+            delta2d = delta.clone().insert_axis(ndarray::Axis(1)); // Column vector
+            nabla_b.push(delta.clone());
+            let a_t = activations[l].clone().insert_axis(ndarray::Axis(0));
+            nabla_w.push(delta2d.dot(&a_t));
+        }
+
+        nabla_b.reverse();
+        nabla_w.reverse();
+
+        (nabla_b, nabla_w)
     }
 
     pub fn evaluate(&self, test_data: &[MnistSample]) -> usize {
